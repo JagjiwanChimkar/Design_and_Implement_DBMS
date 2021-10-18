@@ -1,1 +1,0 @@
-g++ main.cpp -o main && .\main.exe create table students ( id INT , name char )
