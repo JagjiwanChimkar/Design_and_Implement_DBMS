@@ -1,4 +1,2 @@
-Students#id#INT#name#STR#age#INT
-Class#id#INT#name#STR#age#INT
-Dept#id#INT#name#STR#age#INT
-School#id#INT#city#STR
+Teacher#int#INT#name#STR
+Class#int#INT#name#STR

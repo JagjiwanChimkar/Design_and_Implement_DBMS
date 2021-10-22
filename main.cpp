@@ -4,7 +4,7 @@ using namespace std;
 fstream schemafile;
 
 void createTable(vector<string> cmd){
-
+   
     schemafile.open("Schema.txt",ios::app);
 
     string table_name=cmd[2];
@@ -38,11 +38,12 @@ void createTable(vector<string> cmd){
 }
 
 void dropTable(vector<string> cmd){
-    schemafile.open("Schema.txt");
+    schemafile.open("Schema.txt",ios::in);
 
-    ofstream temp("temp.txt");
+    fstream temp;
+    temp.open("temp.txt",ios::out);
 
-    string table_name=cmd[3];
+    string table_name=cmd[2];
     string line;
 
     while(getline(schemafile,line)){
@@ -51,17 +52,100 @@ void dropTable(vector<string> cmd){
             temp<<line<<endl;
         }
     }
-
+    
     schemafile.close();
     temp.close();
 
     remove("Schema.txt");
     rename("temp.txt","Schema.txt");
+    
     cout<<"Table dropped successfully"<<endl;
+  
+}
+
+void describe(vector<string> cmd){
+    schemafile.open("Schema.txt",ios::in);
+
+    if(cmd.size()>1){
+        string table_name=cmd[1];
+        string line;
+
+        while(getline(schemafile,line)){
+            string l1=line.substr(0,line.find('#'));
+
+            if(table_name==l1){
+                string l2=line.substr(line.find('#')+1,line.size());
+                int cnt=1;
+
+                for(auto i:l2){
+                    if(i=='#'){
+                        if(cnt%2!=0){
+                            cout<<"--";
+                        }else{
+                            cout<<endl;
+                        }
+                        cnt++;
+                    }else{
+                        cout<<i;
+                    }
+                }
+            }
+        }
+
+    }else{
+        cout<<"please mention table name"<<endl;
+    }
+}
+
+void insert(vector<string> cmd){
+    string table_name=cmd[2];
+    fstream table;
+    table.open(table_name+".txt",ios::app);
+
+    
+    int start=-1,end=-1;
+    for(int i=4;i<cmd.size();i++){
+            if(cmd[i]=="("){
+                start=i;
+            }
+            if(cmd[i]==")"){
+                end=i;
+            }
+    }
+
+    if(start==-1 || end==-1){
+        cout<<"Error"<<endl;
+        return;
+    }
+    while(start<end-1){
+        start++;
+        if(cmd[start]!=","){
+            table<<cmd[start];
+            if(start!=end-1){
+                table<<"#";
+            }else{
+                table<<"\n";
+            }
+        }
+    }
+
+}
+
+void update(vector<string> cmd){
+
+}
+
+void delete_(vector<string> cmd){
+
+}
+
+void select(vector<string> cmd){
+
 }
 
 void helpTable(){
     string line;
+    
     schemafile.open("Schema.txt");
 
     int count=0;
@@ -153,6 +237,12 @@ void handleCmd(vector<string> cmd){
     else if(cmd[0]=="help" && cmd[1]!="table"){
         helpCmd(cmd);
     }
+     else if(cmd[0]=="insert" && cmd[1]=="into"){
+        insert(cmd);
+    }
+    else if(cmd[0]=="describe"){
+        describe(cmd);
+    }
     else{
         cout<<"Syntax Error";
     }
@@ -167,20 +257,19 @@ int main() {
     
     getline(cin,input);
    
-    cout<<"input:"<<input<<endl;
+    // cout<<"input:"<<input<<endl;
 
-    while(input!="quit"){
+    while(input!="q"){
 
         convertToVector(input,cmd);
         handleCmd(cmd);
-        
 
         cmd.clear();
         cout<<"\nGrp14-DMS>";
     
         getline(cin,input);
    
-        cout<<"input:"<<input<<endl;
+        // cout<<"input:"<<input<<endl;
     }
     
     return 0;
