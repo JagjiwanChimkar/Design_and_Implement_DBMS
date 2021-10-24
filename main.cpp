@@ -197,21 +197,21 @@ void delete_(vector<string> cmd)
             fstream temp;
             temp.open("temp.txt", ios::out);
 
-            if (cmd[5] == "=")
+            while (getline(table, line))
             {
-                while (getline(table, line))
+                stringstream ss(line);
+                while (ss.good())
                 {
-                    stringstream ss(line);
-                    while (ss.good())
+                    string substr;
+                    getline(ss, substr, '#');
+                    lineVec.push_back(substr);
+                }
+
+                for (i = 1; i < schema.size(); i += 2)
+                {
+                    if (cmd[4] == schema[i])
                     {
-                        string substr;
-                        getline(ss, substr, '#');
-                        lineVec.push_back(substr);
-                    }
-                
-                    for (i = 1; i < schema.size(); i += 2)
-                    {
-                        if (cmd[4] == schema[i])
+                        if (cmd[5] == "=")
                         {
                             if (cmd[6] == lineVec[j])
                             {
@@ -219,22 +219,62 @@ void delete_(vector<string> cmd)
                                 count++;
                             }
                         }
-                        j++;
+                        if (cmd[5] == ">")
+                        {
+                            if (lineVec[j] < cmd[6])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[5] == "<")
+                        {
+                            if (lineVec[j] < cmd[6] )
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[5] == ">=")
+                        {
+                            if ( lineVec[j] >= cmd[6])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[5] == "<=")
+                        {
+                            if (lineVec[j] <= cmd[6])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[5] == "!=")
+                        {
+                            if (cmd[6] != lineVec[j])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
                     }
-                    if (flag != 1)
-                    {
-                        temp << line << endl;
-                    }
-                    flag = 0;
+                    j++;
                 }
-                table.close();
-                temp.close();
-                string table1 = table_name + ".txt";
-                char c[table1.size() + 1];
-                strcpy(c, table1.c_str());
-                remove(c);
-                rename("temp.txt", c);
+                if (flag != 1)
+                {
+                    temp << line << endl;
+                }
+                flag = 0;
             }
+            table.close();
+            temp.close();
+            string table1 = table_name + ".txt";
+            char c[table1.size() + 1];
+            strcpy(c, table1.c_str());
+            remove(c);
+            rename("temp.txt", c);
         }
         cout << count << " rows deleted" << endl;
     }
