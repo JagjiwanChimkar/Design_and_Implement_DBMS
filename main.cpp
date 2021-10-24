@@ -5,8 +5,7 @@ fstream schemafile;
 
 void fetchSchema(string tableName, vector<string> &schema);
 
-void createTable(vector<string> cmd)
-{
+void createTable(vector<string> cmd){
 
     schemafile.open("Schema.txt", ios::app);
 
@@ -46,8 +45,7 @@ void createTable(vector<string> cmd)
     schemafile.close();
 }
 
-void dropTable(vector<string> cmd)
-{
+void dropTable(vector<string> cmd){
     schemafile.open("Schema.txt", ios::in);
 
     fstream temp;
@@ -74,8 +72,7 @@ void dropTable(vector<string> cmd)
     cout << "Table dropped successfully" << endl;
 }
 
-void describe(vector<string> cmd)
-{
+void describe(vector<string> cmd){
     schemafile.open("Schema.txt", ios::in);
 
     if (cmd.size() > 1)
@@ -120,8 +117,7 @@ void describe(vector<string> cmd)
     }
 }
 
-void insert(vector<string> cmd)
-{
+void insert(vector<string> cmd){
     string table_name = cmd[2];
     fstream table;
     table.open(table_name + ".txt", ios::app);
@@ -162,12 +158,10 @@ void insert(vector<string> cmd)
     }
 }
 
-void update(vector<string> cmd)
-{
+void update(vector<string> cmd){
 }
 
-void delete_(vector<string> cmd)
-{
+void delete_(vector<string> cmd){
 
     vector<string> schema;
     fetchSchema(cmd[2], schema);
@@ -276,16 +270,14 @@ void delete_(vector<string> cmd)
             remove(c);
             rename("temp.txt", c);
         }
-        cout << count << " rows deleted" << endl;
+        count << " rows deleted" << endl;
     }
 }
 
-void select(vector<string> cmd)
-{
+void select(vector<string> cmd){
 }
 
-void helpTable()
-{
+void helpTable(){
     string line;
 
     schemafile.open("Schema.txt");
@@ -303,8 +295,7 @@ void helpTable()
     }
 }
 
-void helpCmd(vector<string> cmd)
-{
+void helpCmd(vector<string> cmd){
     cout << "\n------------HELP----------------" << endl;
     map<string, int> help{{"createtable", 1}, {"droptable", 2}, {"select", 3}, {"insert", 4}, {"delete", 5}, {"update", 6}};
     map<string, int>::iterator it1;
@@ -355,8 +346,7 @@ void helpCmd(vector<string> cmd)
     }
 }
 
-void convertToVector(string input, vector<string> &v)
-{
+void convertToVector(string input, vector<string> &v){
     string word = "";
     for (auto x : input)
     {
@@ -373,8 +363,7 @@ void convertToVector(string input, vector<string> &v)
     v.push_back(word);
 }
 
-void fetchSchema(string tableName, vector<string> &schema)
-{
+void fetchSchema(string tableName, vector<string> &schema){
     schemafile.open("Schema.txt", ios::in);
     string line;
     int flag = 0;
@@ -434,8 +423,7 @@ void fetchSchema(string tableName, vector<string> &schema)
     rename("temp.txt", c);
 } */
 
-void handleCmd(vector<string> cmd)
-{
+void handleCmd(vector<string> cmd){
     if (cmd[0] == "create" && cmd[1] == "table")
     {
         createTable(cmd);
@@ -470,8 +458,7 @@ void handleCmd(vector<string> cmd)
     }
 }
 
-int main()
-{
+int main(){
 
     vector<string> cmd;
     string input;
