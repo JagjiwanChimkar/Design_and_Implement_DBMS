@@ -159,6 +159,119 @@ void insert(vector<string> cmd){
 }
 
 void update(vector<string> cmd){
+
+     vector<string> schema;
+    fetchSchema(cmd[2], schema);
+    int count = 0;
+
+    if (!schema.empty())
+    {
+        auto it = find(cmd.begin(), cmd.end(),"where");
+        int index = 0; // finding the index of where clause
+         if (it != cmd.end())
+      {
+        index = it - cmd.begin();
+      }
+    else {
+      // if 'where' condition is not there.
+        cout << "Syntax error" << endl;
+    }
+       
+       
+            string table_name = cmd[2];
+            fstream table;
+            table.open(table_name + ".txt", ios::in);
+            string line;
+
+            int i, j;
+            j = 0;
+            int flag = 0;
+            vector<string> lineVec;
+
+            fstream temp;
+            temp.open("temp.txt", ios::out);
+
+            while (getline(table, line))
+            {
+                stringstream ss(line);
+                while (ss.good())
+                {
+                    string substr;
+                    getline(ss, substr, '#');
+                    lineVec.push_back(substr);
+                }
+
+                for (i = 1; i < schema.size(); i += 2)
+                {
+                    if (cmd[index+1] == schema[i])
+                    {
+                        if (cmd[index + 2] == "=")
+                        {
+                            if (cmd[index + 3] == lineVec[j])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[index + 2] == ">")
+                        {
+                            if (lineVec[j] < cmd[index + 3])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[index + 2] == "<")
+                        {
+                            if (lineVec[j] < cmd[index + 3] )
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[index + 2] == ">=")
+                        {
+                            if ( lineVec[j] >= cmd[index + 3])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[index + 2] == "<=")
+                        {
+                            if (lineVec[j] <= cmd[index + 3])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                        if (cmd[index + 2] == "!=")
+                        {
+                            if (cmd[index + 3] != lineVec[j])
+                            {
+                                flag = 1;
+                                count++;
+                            }
+                        }
+                    }
+                    j++;
+                }
+                if (flag != 1)
+                {
+                    temp << line << endl;
+                }
+                flag = 0;
+            }
+            // table.close();
+            // temp.close();
+            // string table1 = table_name + ".txt";
+            // char c[table1.size() + 1];
+            // strcpy(c, table1.c_str());
+            // remove(c);
+            // rename("temp.txt", c);
+        
+       
+    }
 }
 
 void delete_(vector<string> cmd){
@@ -270,7 +383,7 @@ void delete_(vector<string> cmd){
             remove(c);
             rename("temp.txt", c);
         }
-        count << " rows deleted" << endl;
+        cout << " rows deleted" << endl;
     }
 }
 
@@ -451,6 +564,9 @@ void handleCmd(vector<string> cmd){
     else if (cmd[0] == "delete" && cmd[1] == "from")
     {
         delete_(cmd);
+    }
+    else if(cmd[0] == "update" && cmd[2]== "set"){
+        update(cmd);
     }
     else
     {
