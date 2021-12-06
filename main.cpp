@@ -115,6 +115,7 @@ void describe(vector<string> cmd){
     {
         cout << "please mention table name" << endl;
     }
+    schemafile.close();
 }
 
 void insert(vector<string> cmd){
@@ -159,9 +160,9 @@ void insert(vector<string> cmd){
 }
 
 void update(vector<string> cmd){
-
-     vector<string> schema;
-    fetchSchema(cmd[2], schema);
+  cout<< "HII";
+    vector<string> schema;
+    fetchSchema(cmd[1], schema);
     int count = 0;
 
     if (!schema.empty())
@@ -178,7 +179,7 @@ void update(vector<string> cmd){
     }
        
        
-            string table_name = cmd[2];
+            string table_name = cmd[1];
             fstream table;
             table.open(table_name + ".txt", ios::in);
             string line;
@@ -262,6 +263,7 @@ void update(vector<string> cmd){
                 }
                 flag = 0;
             }
+
             // table.close();
             // temp.close();
             // string table1 = table_name + ".txt";
@@ -388,6 +390,29 @@ void delete_(vector<string> cmd){
 }
 
 void select(vector<string> cmd){
+    cout<< "yes";
+    schemafile.open("Schema.txt", ios::in);
+
+    //  vector<string> schema;
+    // fetchSchema(cmd[2], schema);
+    // int count = 0;
+
+    // if (!schema.empty())
+    // {
+        auto it = find(cmd.begin(), cmd.end(),"from");
+        int index = 0; // finding the index of where clause
+         if (it != cmd.end())
+      {
+        index = it - cmd.begin();
+      }
+    else {
+      // if 'from' word is not there.
+        cout << "Syntax errors" << endl;
+    }
+  
+     int tablename_pos = index + 1;  // position oof table_name
+
+      cout<< tablename_pos;
 }
 
 void helpTable(){
@@ -561,6 +586,9 @@ void handleCmd(vector<string> cmd){
     {
         describe(cmd);
     }
+    else if(cmd[0] == "select"){
+        select(cmd);
+    }
     else if (cmd[0] == "delete" && cmd[1] == "from")
     {
         delete_(cmd);
@@ -568,9 +596,10 @@ void handleCmd(vector<string> cmd){
     else if(cmd[0] == "update" && cmd[2]== "set"){
         update(cmd);
     }
+  
     else
     {
-        cout << "Syntax Error";
+        cout << "Syntax Errors";
     }
 }
 

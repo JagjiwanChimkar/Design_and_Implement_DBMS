@@ -1,2 +1,2 @@
-Teacher#int#INT#name#STR
+Teacher#id#INT#name#STR
 Class#int#INT#name#STR
