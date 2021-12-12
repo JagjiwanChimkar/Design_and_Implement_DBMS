@@ -389,30 +389,80 @@ void delete_(vector<string> cmd){
     }
 }
 
-void select(vector<string> cmd){
-    cout<< "yes";
-    schemafile.open("Schema.txt", ios::in);
+void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>& mp){
+    fstream table(tableName+".txt",ios::in);
+    string line;
 
-    //  vector<string> schema;
-    // fetchSchema(cmd[2], schema);
-    // int count = 0;
+    while(getline(table,line)){
+        stringstream ss(line);
+        vector<string> data;
 
-    // if (!schema.empty())
-    // {
-        auto it = find(cmd.begin(), cmd.end(),"from");
-        int index = 0; // finding the index of where clause
-         if (it != cmd.end())
-      {
-        index = it - cmd.begin();
-      }
-    else {
-      // if 'from' word is not there.
-        cout << "Syntax errors" << endl;
+        while (ss.good()){
+            string substr;
+            getline(ss, substr, '#');
+            data.push_back(substr);
+        } 
+
+        for(int i=0;i<att.size();i++){
+            cout<<data[mp[att[i]]]<<" ";
+        }
+        cout<<endl;
     }
-  
-     int tablename_pos = index + 1;  // position oof table_name
+}
 
-      cout<< tablename_pos;
+void select(vector<string> cmd){
+  
+    vector<string> attr_list;
+   
+    auto it = find(cmd.begin(), cmd.end(),"from");
+    int index = 0; // finding the index of from clause
+
+    if(it != cmd.end()){
+        index = it - cmd.begin();
+    }else{
+        cout << "Syntax error" << endl;
+    }
+
+    
+    for(int i=1;i<index;i+=2){
+        attr_list.push_back(cmd[i]);
+        // cout<<attr_list[k++]<<" ";
+    }
+
+    int tablename_pos = index + 1;  // position of table_name
+
+    unordered_map<string,int> table_attr;
+    vector<string> schema;
+
+    fetchSchema(cmd[tablename_pos],schema);
+
+    int k=0;
+    for(int i=1;i<schema.size();i+=2){
+        table_attr[schema[i]]=k++;
+        // cout<<schema[i]<<" ";
+    }
+
+    bool atterror=false;
+    for(auto x:attr_list){
+        if(table_attr.find(x)==table_attr.end()){
+            cout<<"Attribute Error"<<endl;
+            attError=true;
+            break;
+        }
+    }
+
+    if(attError) return;
+    
+    fetchTable(cmd[tablename_pos],attr_list,table_attr);
+
+    auto itw = find(cmd.begin(), cmd.end(),"where");
+    int indexofwhere = 0; // finding the index of where clause
+    if (itw != cmd.end()){
+        indexofwhere = itw - cmd.begin();
+    }else {
+        // print all rows if there is no where condition
+    }
+     
 }
 
 void helpTable(){
@@ -509,13 +559,11 @@ void fetchSchema(string tableName, vector<string> &schema){
     while (getline(schemafile, line))
     {
         string l1 = line.substr(0, line.find('#'));
-        if (tableName == l1)
-        {
+        if (tableName == l1){
             flag = 1;
             stringstream ss(line);
 
-            while (ss.good())
-            {
+            while (ss.good()){
                 string substr;
                 getline(ss, substr, '#');
                 schema.push_back(substr);
@@ -523,8 +571,7 @@ void fetchSchema(string tableName, vector<string> &schema){
             break;
         }
     }
-    if (flag == 0)
-    {
+    if (flag == 0){
         cout << "table not found" << endl;
     }
 
