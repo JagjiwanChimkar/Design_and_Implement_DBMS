@@ -160,7 +160,7 @@ void insert(vector<string> cmd){
 }
 
 void update(vector<string> cmd){
-  cout<< "HII";
+
     vector<string> schema;
     fetchSchema(cmd[1], schema);
     int count = 0;
@@ -264,13 +264,13 @@ void update(vector<string> cmd){
                 flag = 0;
             }
 
-            // table.close();
-            // temp.close();
-            // string table1 = table_name + ".txt";
-            // char c[table1.size() + 1];
-            // strcpy(c, table1.c_str());
-            // remove(c);
-            // rename("temp.txt", c);
+            table.close();
+            temp.close();
+            string table1 = table_name + ".txt";
+            char c[table1.size() + 1];
+            strcpy(c, table1.c_str());
+            remove(c);
+            rename("temp.txt", c);
         
        
     }
@@ -393,6 +393,10 @@ void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>&
     fstream table(tableName+".txt",ios::in);
     string line;
 
+    cout<<"\n";
+    for(auto x:att) cout<<x<<"\t";
+    cout<<"\n\n";
+
     while(getline(table,line)){
         stringstream ss(line);
         vector<string> data;
@@ -402,9 +406,9 @@ void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>&
             getline(ss, substr, '#');
             data.push_back(substr);
         } 
-
+        
         for(int i=0;i<att.size();i++){
-            cout<<data[mp[att[i]]]<<" ";
+            cout<<data[mp[att[i]]]<<"\t";
         }
         cout<<endl;
     }
@@ -426,7 +430,6 @@ void select(vector<string> cmd){
     
     for(int i=1;i<index;i+=2){
         attr_list.push_back(cmd[i]);
-        // cout<<attr_list[k++]<<" ";
     }
 
     int tablename_pos = index + 1;  // position of table_name
@@ -442,7 +445,7 @@ void select(vector<string> cmd){
         // cout<<schema[i]<<" ";
     }
 
-    bool atterror=false;
+    bool attError=false;
     for(auto x:attr_list){
         if(table_attr.find(x)==table_attr.end()){
             cout<<"Attribute Error"<<endl;
