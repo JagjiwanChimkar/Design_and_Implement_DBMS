@@ -1,1 +1,13 @@
 g++ main.cpp -o main && .\main.exe 
+
+create table School ( id INT , name STR )
+
+drop table School
+
+describe Teacher
+
+insert into Teacher values ( 40 , John )
+
+delete from Teacher where id = 40
+
+help tables

@@ -11,7 +11,7 @@ void createTable(vector<string> cmd){
 
     string table_name = cmd[2];
     schemafile << table_name;
-
+ 
     int start = -1, end = -1;
     for (int i = 3; i < cmd.size(); i++)
     {
@@ -791,11 +791,11 @@ void handleCmd(vector<string> cmd){
     {
         dropTable(cmd);
     }
-    else if (cmd[0] == "help" && cmd[1] == "table")
+    else if (cmd[0] == "help" && cmd[1] == "tables")
     {
         helpTable();
     }
-    else if (cmd[0] == "help" && cmd[1] != "table")
+    else if (cmd[0] == "help" && cmd[1] != "tables")
     {
         helpCmd(cmd);
     }
