@@ -159,121 +159,290 @@ void insert(vector<string> cmd){
     }
 }
 
-void update(vector<string> cmd){
+// void update(vector<string> cmd){
 
+//     vector<string> schema;
+//     fetchSchema(cmd[1], schema);
+//     int count = 0;
+
+//     if (!schema.empty())
+//     {
+//         auto it = find(cmd.begin(), cmd.end(),"where");
+//         int index = 0; // finding the index of where clause
+//          if (it != cmd.end())
+//       {
+//         index = it - cmd.begin();
+//       }
+//     else {
+//       // if 'where' condition is not there.
+//         cout << "Syntax error" << endl;
+//     }
+       
+       
+//             string table_name = cmd[1];
+//             fstream table;
+//             table.open(table_name + ".txt", ios::in);
+//             string line;
+
+//             int i, j;
+//             j = 0;
+//             int flag = 0;
+//             vector<string> lineVec;
+
+//             fstream temp;
+//             temp.open("temp.txt", ios::out);
+
+//             while (getline(table, line))
+//             {
+//                 stringstream ss(line);
+//                 while (ss.good())
+//                 {
+//                     string substr;
+//                     getline(ss, substr, '#');
+//                     lineVec.push_back(substr);
+//                 }
+
+//                 for (i = 1; i < schema.size(); i += 2)
+//                 {
+//                     if (cmd[index+1] == schema[i])
+//                     {
+//                         if (cmd[index + 2] == "=")
+//                         {
+//                             if (cmd[index + 3] == lineVec[j])
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                         if (cmd[index + 2] == ">")
+//                         {
+//                             if (lineVec[j] < cmd[index + 3])
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                         if (cmd[index + 2] == "<")
+//                         {
+//                             if (lineVec[j] < cmd[index + 3] )
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                         if (cmd[index + 2] == ">=")
+//                         {
+//                             if ( lineVec[j] >= cmd[index + 3])
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                         if (cmd[index + 2] == "<=")
+//                         {
+//                             if (lineVec[j] <= cmd[index + 3])
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                         if (cmd[index + 2] == "!=")
+//                         {
+//                             if (cmd[index + 3] != lineVec[j])
+//                             {
+//                                 flag = 1;
+//                                 count++;
+//                             }
+//                         }
+//                     }
+//                     j++;
+//                 }
+//                 if (flag != 1)
+//                 {
+//                     temp << line << endl;
+//                 }
+//                 flag = 0;
+//             }
+
+//             table.close();
+//             temp.close();
+//             string table1 = table_name + ".txt";
+//             char c[table1.size() + 1];
+//             strcpy(c, table1.c_str());
+//             remove(c);
+//             rename("temp.txt", c);
+        
+       
+//     }
+// }
+//check cloumn number in table
+void table_number(map<string, int>& table, vector<string> schema){
+    int cnt = 0;
+    for(int j=1; j<schema.size(); j+=2){
+        table[schema[j]] = cnt;
+        cnt++;
+    }
+}
+
+//Check column of table
+void checkCommand(map<int, string>& column_change, vector<string> cmd, vector<string> schema){
+    int i;
+    map<string, int> table;
+    table_number(table, schema);
+    for(i=3; i<cmd.size() && cmd[i]!="where"; i+=3){
+        int col = table[cmd[i]];
+        column_change[col] = cmd[i+2];
+    }
+}
+
+void update(vector<string> cmd) {
     vector<string> schema;
     fetchSchema(cmd[1], schema);
-    int count = 0;
 
-    if (!schema.empty())
-    {
-        auto it = find(cmd.begin(), cmd.end(),"where");
-        int index = 0; // finding the index of where clause
-         if (it != cmd.end())
-      {
-        index = it - cmd.begin();
-      }
-    else {
-      // if 'where' condition is not there.
-        cout << "Syntax error" << endl;
-    }
-       
-       
-            string table_name = cmd[1];
-            fstream table;
-            table.open(table_name + ".txt", ios::in);
-            string line;
+    if(!schema.empty()){
+        string table_name = cmd[1] + ".txt";
+        fstream table;
+        const char *c = table_name.c_str();
+        table.open(c, ios::in);
+        vector<string>::iterator it;
+        it = find(cmd.begin(), cmd.end(), "where");
+        map<int, string> column_change;
+        checkCommand(column_change, cmd, schema);
 
-            int i, j;
-            j = 0;
-            int flag = 0;
-            vector<string> lineVec;
+        string line;
+        vector<string> lineVec;
+        int i, j=0;
+        int flag = 0;
+        int count = 0;
+        fstream temp;
+        temp.open("temp.txt", ios::out);
+        //where condition is not in command
+        if(it == cmd.end()){
+            while(getline(table, line)){
+                string tab = line;
+                i=0;
+                string curr = "";
+                while(i<tab.length()){
+                    if(tab[i] == '#'){
+                        lineVec.push_back(curr);
+                        curr = "";
+                    }else{
+                        curr += tab[i];
+                    }
+                    i++;
+                }
+                lineVec.push_back(curr);
 
-            fstream temp;
-            temp.open("temp.txt", ios::out);
-
-            while (getline(table, line))
-            {
-                stringstream ss(line);
-                while (ss.good())
-                {
-                    string substr;
-                    getline(ss, substr, '#');
-                    lineVec.push_back(substr);
+                string new_line = "";
+                map<int, string>::iterator itr;
+                for(itr=column_change.begin(); itr!=column_change.end(); itr++){
+                    lineVec[itr->first] = itr->second;
                 }
 
-                for (i = 1; i < schema.size(); i += 2)
-                {
-                    if (cmd[index+1] == schema[i])
-                    {
-                        if (cmd[index + 2] == "=")
-                        {
-                            if (cmd[index + 3] == lineVec[j])
-                            {
+                for(i=0; i<lineVec.size()-1; i++){
+                    cout<<lineVec[i]<<endl;
+                    new_line += lineVec[i]; 
+                    new_line += "#";
+                }
+                new_line += lineVec[i];
+                temp << new_line << endl;
+            }
+        }
+        //where condition is in command
+        else{
+            while (getline(table, line)) {
+                string tab = line;
+                i=0;
+                string curr = "";
+                while(i<tab.length()){
+                    if(tab[i] == '#'){
+                        lineVec.push_back(curr);
+                        curr = "";
+                    }else{
+                        curr += tab[i];
+                    }
+                    i++;
+                }
+                lineVec.push_back(curr);
+            
+                int idx = 0;
+                idx = it - cmd.begin();
+                for(i=1; i<schema.size(); i+=2){
+                    if(cmd[idx+1] == schema[i]){
+                        //Equality condition
+                        if(cmd[idx+2] == "="){
+                            if(cmd[idx+3] == lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
-                        if (cmd[index + 2] == ">")
-                        {
-                            if (lineVec[j] < cmd[index + 3])
-                            {
+                        //Greater than condition
+                        if(cmd[idx+2] == ">"){
+                            if(cmd[idx+3] > lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
-                        if (cmd[index + 2] == "<")
-                        {
-                            if (lineVec[j] < cmd[index + 3] )
-                            {
+                        //Greater than or equal to
+                        if(cmd[idx+2] == ">="){
+                            if(cmd[idx+3] >= lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
-                        if (cmd[index + 2] == ">=")
-                        {
-                            if ( lineVec[j] >= cmd[index + 3])
-                            {
+                        //smaller than condition
+                        if(cmd[idx+2] == "<"){
+                            if(cmd[idx+3] < lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
-                        if (cmd[index + 2] == "<=")
-                        {
-                            if (lineVec[j] <= cmd[index + 3])
-                            {
+                        //smaller than and equal to
+                        if(cmd[idx+2] == "<="){
+                            if(cmd[idx+3] <= lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
-                        if (cmd[index + 2] == "!=")
-                        {
-                            if (cmd[index + 3] != lineVec[j])
-                            {
+                        //Not equal to condition
+                        if(cmd[idx+2] == "!="){
+                            if(cmd[idx+3] != lineVec[j]){
                                 flag = 1;
                                 count++;
                             }
                         }
                     }
                     j++;
-                }
-                if (flag != 1)
-                {
+                } 
+                //Not making any changes in the row
+                if(flag != 1){
                     temp << line << endl;
                 }
-                flag = 0;
-            }
+                //make changes in a row 
+                else{
+                    string new_line = "";
+                    map<int, string>::iterator itr;
+                    for(itr=column_change.begin(); itr!=column_change.end(); itr++){
+                        lineVec[itr->first] = itr->second;
+                    }
 
-            table.close();
-            temp.close();
-            string table1 = table_name + ".txt";
-            char c[table1.size() + 1];
-            strcpy(c, table1.c_str());
-            remove(c);
-            rename("temp.txt", c);
-        
-       
+                    for(i=0; i<lineVec.size()-1; i++){
+                        new_line += lineVec[i]; 
+                        new_line += "#";
+                    }
+                    new_line += lineVec[i];
+                    temp << new_line << endl;
+                }
+                flag = 0; 
+            }  
+        }
+        table.close();
+        temp.close();
+        remove(c);
+        rename("temp.txt", c);
+        cout<<"Rows updated successfully"<<endl;
     }
+    cout << "\n-----------------------------------------------------------------" << endl;
 }
 
 void delete_(vector<string> cmd){
@@ -413,6 +582,8 @@ void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>&
         cout<<endl;
     }
 }
+
+
 
 void select(vector<string> cmd){
   
