@@ -295,6 +295,7 @@ void checkCommand(map<int, string>& column_change, vector<string> cmd, vector<st
     }
 }
 
+//Update function
 void update(vector<string> cmd) {
     vector<string> schema;
     fetchSchema(cmd[1], schema);
@@ -340,12 +341,12 @@ void update(vector<string> cmd) {
                 }
 
                 for(i=0; i<lineVec.size()-1; i++){
-                    cout<<lineVec[i]<<endl;
                     new_line += lineVec[i]; 
                     new_line += "#";
                 }
                 new_line += lineVec[i];
                 temp << new_line << endl;
+                lineVec.clear();
             }
         }
         //where condition is in command
@@ -364,49 +365,50 @@ void update(vector<string> cmd) {
                     i++;
                 }
                 lineVec.push_back(curr);
-            
+
                 int idx = 0;
                 idx = it - cmd.begin();
+                j=0;
                 for(i=1; i<schema.size(); i+=2){
                     if(cmd[idx+1] == schema[i]){
                         //Equality condition
                         if(cmd[idx+2] == "="){
-                            if(cmd[idx+3] == lineVec[j]){
+                            if(lineVec[j] == cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
                         }
                         //Greater than condition
                         if(cmd[idx+2] == ">"){
-                            if(cmd[idx+3] > lineVec[j]){
+                            if(lineVec[j] > cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
                         }
                         //Greater than or equal to
                         if(cmd[idx+2] == ">="){
-                            if(cmd[idx+3] >= lineVec[j]){
+                            if(lineVec[j] >= cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
                         }
                         //smaller than condition
                         if(cmd[idx+2] == "<"){
-                            if(cmd[idx+3] < lineVec[j]){
+                            if(lineVec[j] < cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
                         }
                         //smaller than and equal to
                         if(cmd[idx+2] == "<="){
-                            if(cmd[idx+3] <= lineVec[j]){
+                            if(lineVec[j] <= cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
                         }
                         //Not equal to condition
                         if(cmd[idx+2] == "!="){
-                            if(cmd[idx+3] != lineVec[j]){
+                            if(lineVec[j] != cmd[idx+3]){
                                 flag = 1;
                                 count++;
                             }
@@ -417,6 +419,7 @@ void update(vector<string> cmd) {
                 //Not making any changes in the row
                 if(flag != 1){
                     temp << line << endl;
+                    lineVec.clear();
                 }
                 //make changes in a row 
                 else{
@@ -432,8 +435,9 @@ void update(vector<string> cmd) {
                     }
                     new_line += lineVec[i];
                     temp << new_line << endl;
+                    lineVec.clear();
                 }
-                flag = 0; 
+                flag = 0;
             }  
         }
         table.close();
