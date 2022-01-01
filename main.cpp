@@ -5,13 +5,33 @@ fstream schemafile;
 
 void fetchSchema(string tableName, vector<string> &schema);
 
+bool checkTable(string tableName){
+    schemafile.open("Schema.txt", ios::in);
+    string line;
+    bool flag=false;
+    while(getline(schemafile,line)){
+        if(line.substr(0, line.find('#'))==tableName){
+            flag=true;
+            break;
+        }
+    }
+    schemafile.close();
+    return flag;
+}
+
 void createTable(vector<string> cmd){
 
-    schemafile.open("Schema.txt", ios::app);
-
     string table_name = cmd[2];
+
+    if(checkTable(table_name)){
+        cout<<"Table Already Exists"<<endl;
+        return;
+    }
+
+    schemafile.open("Schema.txt", ios::app);
     schemafile << table_name;
- 
+
+
     int start = -1, end = -1;
     for (int i = 3; i < cmd.size(); i++)
     {
@@ -46,12 +66,18 @@ void createTable(vector<string> cmd){
 }
 
 void dropTable(vector<string> cmd){
+    
+    string table_name = cmd[2];
+    if(!checkTable(table_name)){
+        cout<<"Table Not Exists"<<endl;
+        return;
+    }
+
     schemafile.open("Schema.txt", ios::in);
 
     fstream temp;
     temp.open("temp.txt", ios::out);
 
-    string table_name = cmd[2];
     string line;
 
     while (getline(schemafile, line))
@@ -70,12 +96,14 @@ void dropTable(vector<string> cmd){
     rename("temp.txt", "Schema.txt");
 
     string f = table_name + ".txt";
-    char fileName[f.length()+1];
+    char fileName[f.length()];
     
     for(int i=0;i<f.length();i++){
         fileName[i] = f[i];
     }
-    
+    fileName[f.length()]='\0';
+
+    // cout<<fileName<<endl;
     remove(fileName);
     
     cout << "Table dropped successfully" << endl;
@@ -167,7 +195,6 @@ void insert(vector<string> cmd){
         }
     }
 }
-
 
 void table_number(map<string, int>& table, vector<string> schema){
     int cnt = 0;
@@ -479,7 +506,6 @@ void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>&
     }
 
 }
-
  
 void select(vector<string> cmd){
   
@@ -563,7 +589,6 @@ void select(vector<string> cmd){
     }
      
 }
-
 
 void helpTable(){
     string line;

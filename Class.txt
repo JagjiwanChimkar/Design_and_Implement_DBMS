@@ -1,6 +1,0 @@
-1#CSA
-2#CSB
-3#CSC
-5#MEA
-6#MEB
-7#AEA

@@ -1,4 +1,4 @@
-g++ main.cpp -o main && .\main.exe 
+g++ main.cpp -o main && main
 
 create table School ( id INT , name STR )
 
@@ -11,3 +11,17 @@ insert into Teacher values ( 40 , John )
 delete from Teacher where id = 40
 
 help tables
+
+update Teacher set id = 20 where id = 23
+
+select id , name from Teacher where id >= 2
+
+//fixed drop table 
+
+//added where in select
+
+//error on same table during create table
+
+//table must exist before drop tables
+
+//
