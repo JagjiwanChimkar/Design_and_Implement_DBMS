@@ -1,3 +1,4 @@
 Class#int#INT#name#STR
 Customer#id#INT#name#STR#mobile#INT#email#STR
-Teacher#id#INT#name#STR
+Teacher#id#INT#name#STR#class#INT
+School#id#INT#name#STR

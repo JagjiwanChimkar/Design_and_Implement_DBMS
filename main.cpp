@@ -339,7 +339,7 @@ void update(vector<string> cmd) {
         rename("temp.txt", c);
         cout<<"Rows updated successfully"<<endl;
     }
-    cout << "\n-----------------------------------------------------------------" << endl;
+    cout << "\n" << endl;
 }
 
 void delete_(vector<string> cmd){
@@ -455,7 +455,8 @@ void delete_(vector<string> cmd){
     }
 }
 
-void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>& mp){
+void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>& mp,
+    vector<vector<string>>& d){
     fstream table(tableName+".txt",ios::in);
     string line;
 
@@ -472,167 +473,97 @@ void fetchTable(string& tableName,vector<string>& att,unordered_map<string,int>&
             getline(ss, substr, '#');
             data.push_back(substr);
         } 
+
+        d.push_back(data);
         
-        for(int i=0;i<att.size();i++){
-            cout<<data[mp[att[i]]]<<"\t";
-        }
-        cout<<endl;
     }
+
 }
 
-
-
-//Select function
-void select(vector<string> cmd) {
-    vector<string>::iterator it;
-    it = find(cmd.begin(), cmd.end(), "from");
+ 
+void select(vector<string> cmd){
+  
+    vector<string> attr_list;
+   
+    auto it = find(cmd.begin(), cmd.end(),"from");
+    int index = 0; // finding the index of from clause
 
     if(it != cmd.end()){
-        int idx_table = 0;
-        idx_table = it - cmd.begin();
-        string table_name = cmd[idx_table+1];
-        vector<string> schema;
-        fetchSchema(table_name, schema);
-
-        if(!schema.empty()){
-            table_name += ".txt";
-            fstream table;
-            const char *c = table_name.c_str();
-            table.open(c, ios::in);
-            vector<string>::iterator it_where;
-            it_where = find(cmd.begin(), cmd.end(), "where");
-            vector<int> attribute;
-
-            string line;
-            int i, j=0;
-            int flag = 0;
-            int count = 0;
-            vector<string> lineVec;
-            map<string, int> table_num;
-            table_number(table_num, schema);
-
-            //Select all attributes
-            if(cmd[1] == "*"){
-                for(i=1; i<schema.size(); i+=2)
-                    attribute.push_back(table_num[schema[i]]);
-            }
-            //Select attributes which mentioned in the query
-            else{
-                for(i=1; i<idx_table; i+=2){
-                    attribute.push_back(table_num[cmd[i]]);
-                }
-            }
-            
-            //where condition is not in command
-            if(it_where == cmd.end()){
-                while(getline(table, line)){
-                    string tab = line;
-                    i=0;
-                    string curr = "";
-                    while(i<tab.length()){
-                        if(tab[i] == '#'){
-                            lineVec.push_back(curr);
-                            curr = "";
-                        }else{
-                            curr += tab[i];
-                        }
-                        i++;
-                    }
-                    lineVec.push_back(curr);
-
-                    string new_line = "";
-                    for(i=0; i<attribute.size(); i++){
-                        new_line += lineVec[attribute[i]];
-                        new_line += "  ---  ";
-                    }
-                    cout<<new_line<<endl;
-                }
-            }
-            //where condition is in command
-            else{
-                while (getline(table, line)) {
-                    string tab = line;
-                    i=0;
-                    string curr = "";
-                    while(i<tab.length()){
-                        if(tab[i] == '#'){
-                            lineVec.push_back(curr);
-                            curr = "";
-                        }else{
-                            curr += tab[i];
-                        }
-                        i++;
-                    }
-                    lineVec.push_back(curr);
-
-                    int idx = 0;
-                    idx = it_where - cmd.begin();
-                    for(i=1; i<schema.size(); i+=2){
-                        if(cmd[idx+1] == schema[i]){
-                            //Equality condition
-                            if(cmd[idx+2] == "="){
-                                if(cmd[idx+3] == lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                            //Greater than condition
-                            if(cmd[idx+2] == ">"){
-                                if(cmd[idx+3] > lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                            //Greater than or equal to
-                            if(cmd[idx+2] == ">="){
-                                if(cmd[idx+3] >= lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                            //smaller than condition
-                            if(cmd[idx+2] == "<"){
-                                if(cmd[idx+3] < lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                            //smaller than and equal to
-                            if(cmd[idx+2] == "<="){
-                                if(cmd[idx+3] <= lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                            //Not equal to condition
-                            if(cmd[idx+2] == "!="){
-                                if(cmd[idx+3] != lineVec[j]){
-                                    flag = 1;
-                                    count++;
-                                }
-                            }
-                        }
-                        j++;
-                    }
-                    // select proper rows from table
-                    if(flag == 1){
-                        string new_line = "";
-                        for(i=0; i<attribute.size(); i++){
-                            new_line += lineVec[attribute[i]];
-                            new_line += "  ---  ";
-                        }
-                        cout<<new_line<<endl;
-                    }
-                    flag = 0; 
-                }
-            }
-            table.close();
-        }
-    }else {
-        cout<<"Syntax error [Table is not mentioned]"<<endl;
+        index = it - cmd.begin();
+    }else{
+        cout << "Syntax error" << endl;
     }
-    cout << "\n-----------------------------------------------------------------" << endl;
+    
+    for(int i=1;i<index;i+=2){
+        attr_list.push_back(cmd[i]);
+    }
+
+
+    int tablename_pos = index + 1;  // position of table_name
+
+    unordered_map<string,int> table_attr;
+    vector<string> schema;
+
+    fetchSchema(cmd[tablename_pos],schema);
+
+    int k=0;
+    for(int i=1;i<schema.size();i+=2){
+        table_attr[schema[i]]=k++;
+    }
+
+    bool atterror=false;
+    bool attError=false;
+    for(auto x:attr_list){
+        if(table_attr.find(x)==table_attr.end()){
+            cout<<"Attribute Error"<<endl;
+            attError=true;
+            break;
+        }
+    }
+
+    if(attError){
+        cout<<" Attribute Error"<<endl;
+        return;
+    } 
+    
+    vector<vector<string>> data;
+    fetchTable(cmd[tablename_pos],attr_list,table_attr,data);
+
+    auto itw = find(cmd.begin(), cmd.end(),"where");
+    int indexofwhere = 0; // finding the index of where clause
+    if (itw != cmd.end()){
+        indexofwhere = itw - cmd.begin();
+        string cnd_att=cmd[indexofwhere+1];
+        string cnd=cmd[indexofwhere+2];
+        string cnd_value=cmd[indexofwhere+3];
+
+        int att_ind=table_attr[cnd_att];
+
+        for(int k=0;k<data.size();k++){
+            if((cnd=="=" && data[k][att_ind]==cnd_value)
+            || (cnd==">" && data[k][att_ind]>cnd_value)
+            || (cnd=="<" && data[k][att_ind]<cnd_value)
+            || (cnd==">=" && data[k][att_ind]>=cnd_value)
+            || (cnd=="<=" && data[k][att_ind]<=cnd_value)
+            || (cnd=="!=" && data[k][att_ind]!=cnd_value)){
+                for(int i=0;i<attr_list.size();i++){
+                    cout<<data[k][table_attr[attr_list[i]]]<<"\t";
+                }
+                cout<<endl;
+            }
+        }
+        
+    }else {
+        for(int k=0;k<data.size();k++){
+            for(int i=0;i<attr_list.size();i++){
+                cout<<data[k][table_attr[attr_list[i]]]<<"\t";
+            }
+            cout<<endl;
+        }
+    }
+     
 }
+
 
 void helpTable(){
     string line;
