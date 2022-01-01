@@ -157,6 +157,10 @@ void describe(vector<string> cmd){
 
 void insert(vector<string> cmd){
     string table_name = cmd[2];
+    if(!checkTable(table_name)){
+        cout<<"Table Not Exists"<<endl;
+        return;
+    }
     fstream table;
     table.open(table_name + ".txt", ios::app);
 
@@ -217,6 +221,12 @@ void checkCommand(map<int, string>& column_change, vector<string> cmd, vector<st
 
 //Update function
 void update(vector<string> cmd) {
+
+    if(!checkTable(cmd[1])){
+        cout<<"Table Not Exists"<<endl;
+        return;
+    }
+
     vector<string> schema;
     fetchSchema(cmd[1], schema);
 
@@ -372,6 +382,10 @@ void update(vector<string> cmd) {
 void delete_(vector<string> cmd){
 
     vector<string> schema;
+    if(!checkTable(cmd[2])){
+        cout<<"Table Not Exists"<<endl;
+        return;
+    }
     fetchSchema(cmd[2], schema);
     int count = 0;
 
@@ -520,12 +534,19 @@ void select(vector<string> cmd){
         cout << "Syntax error" << endl;
     }
     
+     int tablename_pos = index + 1;  // position of table_name
+
+    if(!checkTable(cmd[tablename_pos])){
+        cout<<"Table Not Exists"<<endl;
+        return;
+    }
+
     for(int i=1;i<index;i+=2){
         attr_list.push_back(cmd[i]);
     }
 
 
-    int tablename_pos = index + 1;  // position of table_name
+   
 
     unordered_map<string,int> table_attr;
     vector<string> schema;
