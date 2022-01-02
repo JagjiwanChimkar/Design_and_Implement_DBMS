@@ -108,7 +108,6 @@ void dropTable(vector<string> cmd){
     
     cout << "Table dropped successfully" << endl;
 }
-
 void describe(vector<string> cmd){
     schemafile.open("Schema.txt", ios::in);
 
@@ -246,6 +245,7 @@ void update(vector<string> cmd) {
         int flag = 0;
         int count = 0;
         fstream temp;
+        bool changed=false;
         temp.open("temp.txt", ios::out);
         //where condition is not in command
         if(it == cmd.end()){
@@ -353,6 +353,7 @@ void update(vector<string> cmd) {
                 }
                 //make changes in a row 
                 else{
+                    changed=true;
                     string new_line = "";
                     map<int, string>::iterator itr;
                     for(itr=column_change.begin(); itr!=column_change.end(); itr++){
@@ -374,9 +375,13 @@ void update(vector<string> cmd) {
         temp.close();
         remove(c);
         rename("temp.txt", c);
-        cout<<"Rows updated successfully"<<endl;
+        if(changed){
+            cout<<"Rows updated successfully"<<endl;
+        }
+        else{
+            cout<<"Value not Present"<<endl;
+        }
     }
-    cout << "\n" << endl;
 }
 
 void delete_(vector<string> cmd){
