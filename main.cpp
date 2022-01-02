@@ -154,6 +154,21 @@ void describe(vector<string> cmd){
     schemafile.close();
 }
 
+bool is_number(const std::string& s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && std::isdigit(*it)) ++it;
+    return !s.empty() && it == s.end();
+}
+
+void getDatatype(string tableName,vector<string>& data){
+    vector<string> schema;
+    fetchSchema(tableName,schema);
+    for(int i=2;i<schema.size();i+=2){
+        data.push_back(schema[i]);
+    }
+}
+
 void insert(vector<string> cmd){
     string table_name = cmd[2];
     if(!checkTable(table_name)){
@@ -163,6 +178,10 @@ void insert(vector<string> cmd){
     fstream table;
     table.open(table_name + ".txt", ios::app);
 
+    vector<string> data;
+    getDatatype(table_name,data);
+
+  
     int start = -1, end = -1;
     for (int i = 4; i < cmd.size(); i++)
     {
@@ -181,11 +200,31 @@ void insert(vector<string> cmd){
         cout << "Error" << endl;
         return;
     }
+    int k=0; 
+    bool invalidType=false;
+    int st=start;
+
+    while (st < end - 1)
+    {
+        st++;
+        if (cmd[st] != ",")
+        {
+            if( ( data[k]=="INT" && !is_number(cmd[st]) ) || 
+                ( data[k]!="INT" && is_number(cmd[st]) )){
+                cout<<"Invalid Data Type "<<cmd[st]<<endl;
+                return;
+            }
+            k++;
+        }
+    }
+
+
     while (start < end - 1)
     {
         start++;
         if (cmd[start] != ",")
         {
+           
             table << cmd[start];
             if (start != end - 1)
             {
@@ -197,6 +236,8 @@ void insert(vector<string> cmd){
             }
         }
     }
+
+    
 }
 
 void table_number(map<string, int>& table, vector<string> schema){

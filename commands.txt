@@ -25,3 +25,5 @@ select id , name from Teacher where id >= 2
 //table must exist before drop tables
 
 //print if no tables found in help table cmd
+
+//data type
