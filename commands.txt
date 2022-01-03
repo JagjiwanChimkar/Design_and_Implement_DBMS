@@ -1,20 +1,24 @@
 g++ main.cpp -o main && main
 
-create table School ( id INT , name STR )
+1. create table School ( id INT , name STR )
 
-drop table School
+2. drop table School
 
-describe Teacher
+3. describe Teacher
 
-insert into Teacher values ( 40 , John )
+4. insert into Teacher values ( 40 , John )
 
-delete from Teacher where id = 40
+5. delete from Teacher where id = 40
 
-help tables
+6. help tables
 
-update Teacher set id = 20 where id = 23
+7. update Teacher set id = 20 where id = 23
 
-select id , name from Teacher where id >= 2
+8. select id , name from Teacher where id >= 2
+
+9. help cmd
+
+10. quit
 
 //fixed drop table 
 

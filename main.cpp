@@ -443,6 +443,7 @@ void delete_(vector<string> cmd){
             char c[table.size() + 1];
             strcpy(c, table.c_str());
             remove(c);
+            cout << " Table deleted" << endl;
         }
         else if (cmd[3] == "where")
         {
@@ -537,8 +538,9 @@ void delete_(vector<string> cmd){
             strcpy(c, table1.c_str());
             remove(c);
             rename("temp.txt", c);
+            cout << " rows deleted" << endl;
         }
-        cout << " rows deleted" << endl;
+       
     }
 }
 
